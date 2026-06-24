@@ -43,7 +43,7 @@ A hands-on lab built in EVE-NG: a Fortinet FortiGate perimeter firewall protecti
 
 ## Topology
 
-![Topology diagram](images/topology.png)
+![Topology diagram](Images/Network Topology.png)
 
 - **Inside (port3, `192.168.1.0/24`):** Switch4 connects Kali-Linux (SSH server), a WordPress server.
 - **FortiGate:** port3 = inside/LAN, port2 = outside/WAN (DHCP client).
@@ -69,7 +69,7 @@ A hands-on lab built in EVE-NG: a Fortinet FortiGate perimeter firewall protecti
 
 **Interfaces** — port3 set as a static inside interface with DHCP server enabled for unmanaged hosts; port2 set as a DHCP client on the outside.
 
-![FortiGate interfaces](images/fortigate-interfaces.png)
+![FortiGate interfaces](Images/LAN_WAN Policy 1.png)
 
 **Outbound internet policy** — inside hosts need a NAT-enabled policy (port3 → port2) to reach the internet at all. This was required before WordPress could even download its installer.
 
