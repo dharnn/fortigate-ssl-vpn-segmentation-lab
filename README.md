@@ -43,7 +43,7 @@ A hands-on lab built in EVE-NG: a Fortinet FortiGate perimeter firewall protecti
 
 ## Topology
 
-![Topology diagram](<img width="1515" height="706" alt="Network Topology" src="https://github.com/user-attachments/assets/65b35296-0aaf-4197-a834-8ab1f16a9797" />)
+![Topology diagram](Images/Network%20Topology.png)
 
 - **Inside (port3, `192.168.1.0/24`):** Switch4 connects Kali-Linux (SSH server), a WordPress server.
 - **FortiGate:** port3 = inside/LAN, port2 = outside/WAN (DHCP client).
@@ -69,11 +69,11 @@ A hands-on lab built in EVE-NG: a Fortinet FortiGate perimeter firewall protecti
 
 **Interfaces** — port3 set as a static inside interface with DHCP server enabled for unmanaged hosts; port2 set as a DHCP client on the outside.
 
-![FortiGate interfaces][(Images/LAN_WAN Policy 1.png)](https://github.com/dharnn/fortigate-ssl-vpn-segmentation-lab/blob/34a0b58ce49291a48ebaca648b4637d8516a767d/Images/LAN_WAN%20Policy%201.png)
+![FortiGate interfaces](Images/Network%20Interfaces%201.png)
 
 **Outbound internet policy** — inside hosts need a NAT-enabled policy (port3 → port2) to reach the internet at all. This was required before WordPress could even download its installer.
 
-![Inside to internet policy](images/inside-to-internet-policy.png)
+![Inside to internet policy](Images/LAN_WAN%20Policy%201.png)
 
 ### 2. Internal Services
 
@@ -84,24 +84,28 @@ A hands-on lab built in EVE-NG: a Fortinet FortiGate perimeter firewall protecti
 
 Two real bugs were hit and resolved here — see the [Troubleshooting Log](#troubleshooting-log).
 
-![WordPress install wizard complete](images/wordpress-install-success.png)
+![WordPress install wizard complete](Images/WordPress%20login.png)
 
 **SSH** (Kali Linux)
 - Enabled and started `ssh` service
 - Confirmed listening on port 22
 - Set known credentials for testing
 
-![SSH service status](images/ssh-service-status.png)
+![SSH service status](Images/ssh%20server.png)
 
 ### 3. SSL VPN Configuration
 
 **SSL-VPN Settings** — listening on port2, TCP 443, tunnel-mode IP pool defined for FortiClient users.
 
-![SSL-VPN settings](images/sslvpn-settings.png)
+![SSL-VPN settings](Images/SSL%20VPN%20Settings%201.png)
+![SSL-VPN settings 2](Images/SSL%20VPN%20Settings%202.png)
+![SSL-VPN settings 3](Images/SSL%20VPN%20Settings%203.png)
+
 
 **User, group, and portal mapping** — local user `remoteuser` in a `SSLVPN-Users` group, mapped (along with the mandatory "All Other Users/Groups" catch-all) to the `full-access` portal.
 
-![Portal mapping](images/portal-mapping.png)
+![Portal mapping](Images/SSL%20VPN%20Portal%201.png)
+![Portal mapping](Images/SSL%20VPN%20Portal%202.png)
 
 **Web Mode bookmarks** — two predefined bookmarks on the portal for one-click clientless access:
 
@@ -110,7 +114,7 @@ Two real bugs were hit and resolved here — see the [Troubleshooting Log](#trou
 | `WordPress-Site` | HTTP/HTTPS | `http://192.168.1.4` |
 | `Kali-SSH` | SSH | `192.168.1.3:22` |
 
-![Portal bookmarks](images/portal-bookmarks.png)
+![Portal bookmarks](Images/SSL%20VPN%20Settings%203.png)
 
 **Access control policy** — scopes what the VPN tunnel can actually reach, independent of the portal name:
 
@@ -124,7 +128,8 @@ Action:              ACCEPT
 NAT:                 disabled
 ```
 
-![SSL VPN to inside policy](images/sslvpn-to-inside-policy.png)
+![SSL VPN to inside policy](Images/SSL%20Policy.png)
+![SSL VPN to inside policy 2](Images/SSL%20Policy%201.png)
 
 ---
 
@@ -134,14 +139,15 @@ NAT:                 disabled
 
 From the Windows client, `https://192.168.40.23/remote/login` reached FortiGate's portal with no client software installed.
 
-![SSL VPN web portal login](images/sslvpn-web-login.png)
+![SSL VPN web portal login](Images/Forticlient%20page%20from%20external%20device.png)
+![SSL VPN web portal login 2](Images/Forticlient%20page%20from%20external%20device%202.png)
 
 After authenticating, both bookmarks worked:
 
 - **WordPress-Site** → loaded the internal site through FortiGate's browser-based proxy. **PASS.**
 - **Kali-SSH** → opened an in-browser SSH session to Kali-Linux. **PASS.**
 
-![WordPress reached via SSL VPN web mode](images/wordpress-via-webmode.png)
+![WordPress reached via SSL VPN web mode](Images/Forticlient%20page%20from%20external%20device%203.png)
 
 ### Tunnel Mode (FortiClient) — ⚠️ FAIL (root cause identified)
 
@@ -151,7 +157,10 @@ FortiClient 7.4.3.4726 was installed on the Windows client and pointed at `192.1
 Unable to establish the VPN connection. The VPN server may be unreachable. (-5010)
 ```
 
-![FortiClient connection failure](images/forticlient-failure-log.png)
+![FortiClient connection failure](Images/Forticlient%20page%20from%20external%20device%205.png)
+![FortiClient connection failure 2](Images/Forticlient%20page%20from%20external%20device%206.png)
+![FortiClient connection failure 3](Images/Tunnel%20failure%201.png)
+![FortiClient connection failure 4](Images/Tunnel%20failure%202.png)
 
 See [Root Cause](#root-cause-forticlient--fortios-version-mismatch) below for the full diagnosis.
 
@@ -233,7 +242,8 @@ sslvpn_read_request_common,655, ret=-1 error=-1, sconn=...
 Destroy sconn ..., connSize=0. (root)
 ```
 
-![FortiGate SSL VPN debug output](images/fortigate-sslvpn-debug.png)
+![FortiGate SSL VPN debug output](Images/Tunnel%20failure%201.png)
+![](Images/Forticlient%20page%20from%20external%20device%206.png)
 
 The TLS handshake completes successfully **every single time**. Immediately after, FortiGate fails to read the post-handshake application-layer request from the client, and tears the connection down. That pattern — clean handshake, then an immediate failure in the protocol layer specific to SSL VPN tunnel negotiation — points to a **client/server protocol mismatch**, not a connectivity, certificate, or auth issue.
 
@@ -244,7 +254,8 @@ Confirming both component versions:
 | FortiGate (FortiOS) | `6.4.4`, build 1803 (GA) | 2020 |
 | FortiClient VPN | `7.4.3.4726` | 2025/2026 |
 
-![Version mismatch evidence](images/version-mismatch.png)
+![Version mismatch evidence](Images/FortiClientversion.png)
+![](Images/Tunnel%20failure%202.png)
 
 **Root cause:** a four-major-version gap between FortiClient and FortiOS. FortiClient's SSL VPN tunnel-mode protocol has changed enough across that span that a current client doesn't speak the same post-handshake protocol this older FortiOS build expects. Web Mode is unaffected because it doesn't depend on that protocol layer.
 
@@ -262,14 +273,6 @@ Confirming both component versions:
 - **"Latest" isn't always compatible.** Pulling the newest release of any software against an older underlying stack (PHP, in this case) is a common, avoidable source of otherwise-confusing failures.
 - **Routing and tunnel interfaces are independent of tunnel health.** A healthy IKE/IPsec SA doesn't guarantee traffic is actually being routed into the tunnel — that's a separate, static-route-dependent decision the firewall makes per-packet.
 
----
-
-## Next Steps
-
-- [ ] Obtain a version-matched FortiClient build and confirm Tunnel Mode connects successfully.
-- [ ] Alternatively, upgrade this FortiGate to FortiOS 7.2.x and re-test Tunnel Mode with the current FortiClient release.
-- [ ] Narrow the SSL VPN access policy from the full `192.168.1.0/24` subnet to the two specific service hosts (`192.168.1.3`, `192.168.1.4`) for tighter least-privilege scoping.
-- [ ] Add HTTPS (not just HTTP) to the WordPress bookmark once a certificate is in place.
 
 ---
 
