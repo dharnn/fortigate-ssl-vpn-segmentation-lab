@@ -45,7 +45,7 @@ A hands-on lab built in EVE-NG: a Fortinet FortiGate perimeter firewall protecti
 
 ![Topology diagram](images/topology.png)
 
-- **Inside (port3, `192.168.1.0/24`):** Switch4 connects Kali-Linux (SSH server), a WordPress server, and an unrelated FMC node.
+- **Inside (port3, `192.168.1.0/24`):** Switch4 connects Kali-Linux (SSH server), a WordPress server.
 - **FortiGate:** port3 = inside/LAN, port2 = outside/WAN (DHCP client).
 - **Outside (port2 side):** Switch5 connects a Kali-Outside box, a Windows 10 client (the SSL VPN remote user), and a `Net` cloud node providing real internet access.
 
@@ -57,10 +57,8 @@ A hands-on lab built in EVE-NG: a Fortinet FortiGate perimeter firewall protecti
 |---|---|---|---|
 | FortiGate | port3 (inside) | `192.168.1.1/24` | DHCP scope `192.168.1.20–192.168.1.30` |
 | FortiGate | port2 (outside) | DHCP client | Received `192.168.40.23` |
-| WebTerm (FMC) | eth0 | `192.168.1.2/24` | Not used in this scenario |
 | Kali-Linux (SSH server) | eth0 | `192.168.1.3/24` | Internal SSH target |
 | WordPress | eth0 | `192.168.1.4/24` | Internal web target |
-| Kali-Outside | eth0 | DHCP client | Unused in this scenario |
 | Windows 10 (remote client) | eth0 | DHCP client | SSL VPN client endpoint |
 
 ---
