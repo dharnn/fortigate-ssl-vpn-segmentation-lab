@@ -43,7 +43,7 @@ A hands-on lab built in EVE-NG: a Fortinet FortiGate perimeter firewall protecti
 
 ## Topology
 
-![Topology diagram](Images/Network Topology.png)
+![Topology diagram](<img width="1515" height="706" alt="Network Topology" src="https://github.com/user-attachments/assets/65b35296-0aaf-4197-a834-8ab1f16a9797" />)
 
 - **Inside (port3, `192.168.1.0/24`):** Switch4 connects Kali-Linux (SSH server), a WordPress server.
 - **FortiGate:** port3 = inside/LAN, port2 = outside/WAN (DHCP client).
