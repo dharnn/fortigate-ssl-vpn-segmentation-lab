@@ -69,7 +69,7 @@ A hands-on lab built in EVE-NG: a Fortinet FortiGate perimeter firewall protecti
 
 **Interfaces** — port3 set as a static inside interface with DHCP server enabled for unmanaged hosts; port2 set as a DHCP client on the outside.
 
-![FortiGate interfaces](Images/LAN_WAN Policy 1.png)
+![FortiGate interfaces][(Images/LAN_WAN Policy 1.png)](https://github.com/dharnn/fortigate-ssl-vpn-segmentation-lab/blob/34a0b58ce49291a48ebaca648b4637d8516a767d/Images/LAN_WAN%20Policy%201.png)
 
 **Outbound internet policy** — inside hosts need a NAT-enabled policy (port3 → port2) to reach the internet at all. This was required before WordPress could even download its installer.
 
